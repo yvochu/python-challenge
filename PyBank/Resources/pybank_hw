@@ -1,0 +1,61 @@
+import os
+import csv
+
+# Path to the CSV file
+csvpath = os.path.join("..", "Resources", "budget_data.csv")
+
+# csvpath = os.path.join('Resources', 'budget_data.csv')  # Update with your CSV file path
+
+# Initialize variables
+total_months = 0
+net_total = 0
+previous_profit = 0
+profit_change_list = []
+greatest_increase = ["", 0]
+greatest_decrease = ["", 0]
+
+# Read the CSV file
+with open(csvpath, newline='') as csvfile:
+    csvreader = csv.reader(csvfile, delimiter=',')
+    
+    # Read the header row first
+    csv_header = next(csvreader)
+    
+    # Iterate through each row of data
+    for row in csvreader:
+        # Count the total number of months
+        total_months += 1
+        
+        # Calculate the net total amount of "Profit/Losses" over the entire period
+        current_profit = int(row[1])
+        net_total += current_profit
+        
+        # Calculate change in profit from previous month (skip for the first month)
+        if total_months > 1:
+            profit_change = current_profit - previous_profit
+            profit_change_list.append(profit_change)
+            
+            # Determine the greatest increase in profits (date and amount)
+            if profit_change > greatest_increase[1]:
+                greatest_increase[0] = row[0]
+                greatest_increase[1] = profit_change
+            
+            # Determine the greatest decrease in profits (date and amount)
+            if profit_change < greatest_decrease[1]:
+                greatest_decrease[0] = row[0]
+                greatest_decrease[1] = profit_change
+        
+        # Set previous profit to current profit for the next iteration
+        previous_profit = current_profit
+
+# Calculate the average change
+average_change = sum(profit_change_list) / len(profit_change_list)
+
+# Output results
+print("Financial Analysis")
+print("------------------")
+print(f"Total Months: {total_months}")
+print(f"Total: ${net_total}")
+print(f"Average Change: ${average_change:.2f}")
+print(f"Greatest Increase in Profits: {greatest_increase[0]} (${greatest_increase[1]})")
+print(f"Greatest Decrease in Profits: {greatest_decrease[0]} (${greatest_decrease[1]})")
